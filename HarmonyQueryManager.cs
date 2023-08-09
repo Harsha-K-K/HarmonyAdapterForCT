@@ -82,8 +82,9 @@ namespace CTHarmonyAdapters
                 }
                 else
                 {
-                    var dataInfo = GetValues(parentIdentifier.StudyInstanceUid);
+                    //Debugger.Launch();
 
+                    var dataInfo = Proxy.GetPatientStudyImageInfo(parentIdentifier.StudyInstanceUid);
                     var dcmObject = CreateDicom(dataInfo.studyInfo, dataInfo.patientInfo, dataInfo.imageSeriesInfo);
 
                     var id = Identifier.CreateSeriesIdentifier(Identifier.CreatePatientKeyFromDicomObject(dcmObject), parentIdentifier.StudyInstanceUid, dataInfo.imageSeriesInfo.SeriesInstanceUID);
@@ -141,10 +142,12 @@ namespace CTHarmonyAdapters
 
         public override PersistentDicomObjectCollection QueryChildren(StorageKey storagekey, DicomFilter filter)
         {
+            //Debugger.Launch();
+
             var timer = Stopwatch.StartNew();
             var persistentDicomObjects = new PersistentDicomObjectCollection();
 
-            var dataInfo = GetValues(storagekey.Identifier.StudyInstanceUid);
+            var dataInfo = Proxy.GetPatientStudyImageInfo(storagekey.Identifier.StudyInstanceUid);
 
             var dcmObject = CreateDicom(dataInfo.studyInfo, dataInfo.patientInfo, dataInfo.imageSeriesInfo);
 
@@ -245,20 +248,20 @@ namespace CTHarmonyAdapters
             return dicomObject;
         }
 
-        private IncisiveModel GetValues(string studyInstanceUid)
-        {
-            var patientInfo = Proxy.GetPatientInfo(studyInstanceUid);
+        //private IncisiveModel GetValues(string studyInstanceUid)
+        //{
+        //    var patientInfo = Proxy.GetPatientInfo(studyInstanceUid);
 
-            var studyInfo = Proxy.GetStudyInfo(studyInstanceUid);
+        //    var studyInfo = Proxy.GetStudyInfo(studyInstanceUid);
 
-            var seriesInstanceUid = Proxy.GetSeriesInstanceUids(studyInstanceUid);
-            var instanceUid = seriesInstanceUid as string[] ?? seriesInstanceUid.ToArray();
-            var imageSeriesInfo = Proxy.GetImageSeriesInfo(instanceUid.FirstOrDefault());
+        //    var seriesInstanceUid = Proxy.GetSeriesInstanceUids(studyInstanceUid);
+        //    var instanceUid = seriesInstanceUid as string[] ?? seriesInstanceUid.ToArray();
+        //    var imageSeriesInfo = Proxy.GetImageSeriesInfo(instanceUid.FirstOrDefault());
 
-            var incisiveModel = new IncisiveModel(imageSeriesInfo, patientInfo, studyInfo);
+        //    var incisiveModel = new IncisiveModel(imageSeriesInfo, patientInfo, studyInfo);
 
-            return incisiveModel;
-        }
+        //    return incisiveModel;
+        //}
 
         //private DicomObject CreateDicom(ImageSeriesInfo imageSeriesInfo, StudyInfo studyinfo, PatientInfo patientInfo)
         //{
