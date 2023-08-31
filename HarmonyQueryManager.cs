@@ -1,19 +1,11 @@
 ﻿using ChDefine;
-using PatientDataInfo;
-using Philips.Pcc.CT.Console.Foundation.Common.Function;
-using Philips.Pcc.CT.Console.Foundation.Common.Struct;
-using Philips.Pcc.CT.Console.Foundation.DicomAccessWrapper;
-using Philips.Platform.Adapters.Services;
 using Philips.Platform.ApplicationIntegration.DataAccess;
 using Philips.Platform.Common;
 using Philips.Platform.Common.DataAccess;
-using Philips.Platform.StorageDevicesClient;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 using TraceLevel = Philips.Platform.Common.TraceLevel;
 
 namespace CTHarmonyAdapters
@@ -22,10 +14,25 @@ namespace CTHarmonyAdapters
     {
         public IIncisiveAccessor.IIncisiveAccessor Proxy;
         private const string Uri = "net.tcp://localhost:6565/IncisiveAccessor";
+        private static HarmonyQueryManager instance = null;
 
-        public HarmonyQueryManager()
+        public static HarmonyQueryManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new HarmonyQueryManager();
+                }
+                return instance;
+            }
+        }
+
+        private HarmonyQueryManager()
         {
             var binding = new NetTcpBinding(SecurityMode.None);
+            binding.MaxReceivedMessageSize = int.MaxValue;
+
             var channel = new ChannelFactory<IIncisiveAccessor.IIncisiveAccessor>(binding);
             var endpoint = new EndpointAddress(Uri);
             Proxy = channel.CreateChannel(endpoint);
@@ -54,6 +61,7 @@ namespace CTHarmonyAdapters
 
         public override PersistentDicomObjectCollection Query(string deviceID, QueryLevel level, Identifier parentIdentifier, DicomFilter filter)
         {
+
             var timer = Stopwatch.StartNew();
             var persistentDicomObjects = new PersistentDicomObjectCollection();
 
@@ -119,12 +127,12 @@ namespace CTHarmonyAdapters
 
             timer.Stop();
 
-            var processInfo = Process.GetCurrentProcess();
+            //var processInfo = Process.GetCurrentProcess();
 
-            var logMessage = $"{DateTime.Now:hh.mm.ss.ffffff} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
-                             $" Query {filter.QueryType}:  {timer.ElapsedTicks / 10000} \n";
+            //var logMessage = $"{DateTime.Now:hh.mm.ss.ffffff} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
+            //                 $" Query {filter.QueryType} : {filter.ToString()} :  {timer.ElapsedTicks / 10000} \n";
 
-            File.AppendAllText(@"D:\MyLogs\HarmonyIncisiveLogs.txt", logMessage);
+            //File.AppendAllText(@"D:\MyLogs\HarmonyIncisiveLogs.txt", logMessage);
 
             return persistentDicomObjects;
 
@@ -160,12 +168,12 @@ namespace CTHarmonyAdapters
 
             timer.Stop();
 
-            var processInfo = Process.GetCurrentProcess();
+            //var processInfo = Process.GetCurrentProcess();
 
-            var logMessage = $"{DateTime.Now:hh.mm.ss.ffffff} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
-                             $" QueryChildren {filter.QueryType}:  {timer.ElapsedTicks / 10000} \n";
+            //var logMessage = $"{DateTime.Now:hh.mm.ss.ffffff} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
+            //                 $" QueryChildren {filter.QueryType} : {filter.ToString()}   {timer.ElapsedTicks / 10000} \n";
 
-            File.AppendAllText(@"D:\MyLogs\HarmonyIncisiveLogs.txt", logMessage);
+            //File.AppendAllText(@"D:\MyLogs\HarmonyIncisiveLogs.txt", logMessage);
 
             return persistentDicomObjects;
         }

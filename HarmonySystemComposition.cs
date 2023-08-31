@@ -12,12 +12,12 @@ namespace CTHarmonyAdapters
     {
         protected override LoadManagerBase CreateLoadManager()
         {
-            return new HarmonyLoadManager();
+            return HarmonyLoadManager.Instance;
         }
 
         protected override QueryManagerBase CreateQueryManager()
         {
-            return new HarmonyQueryManager();
+            return HarmonyQueryManager.Instance;
         }
 
         protected override StoreManagerBase CreateStoreManager()

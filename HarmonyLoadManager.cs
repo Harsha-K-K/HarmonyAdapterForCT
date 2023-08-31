@@ -1,20 +1,15 @@
-﻿using System;
+﻿using Philips.Platform.Adapters.Services;
+using Philips.Platform.ApplicationIntegration.DataAccess;
+using Philips.Platform.Common;
+using Philips.Platform.StorageDevicesClient;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Security;
 using System.ServiceModel;
-using System.Text;
+using System.ServiceModel.Channels;
 using System.Threading;
-using System.Threading.Tasks;
-using Philips.Pcc.CT.Console.Foundation.Common.Function;
-using System.Timers;
-using Philips.Platform.Adapters.Services;
-using Philips.Platform.ApplicationIntegration.DataAccess;
-using Philips.Platform.Common;
-using Philips.Platform.StorageDevicesClient;
 
 namespace CTHarmonyAdapters
 {
@@ -22,16 +17,55 @@ namespace CTHarmonyAdapters
     {
         public IIncisiveAccessor.IIncisiveAccessor proxy;
         private const string Uri = "net.tcp://localhost:6565/IncisiveAccessor";
+        private static HarmonyLoadManager instance = null;
 
-
-        public HarmonyLoadManager()
-        {
+        private HarmonyLoadManager() {
             var binding = new NetTcpBinding(SecurityMode.None);
+            binding.MaxReceivedMessageSize = int.MaxValue;
+
             var channel = new ChannelFactory<IIncisiveAccessor.IIncisiveAccessor>(binding);
             var endpoint = new EndpointAddress(Uri);
 
             proxy = channel.CreateChannel(endpoint);
+        }
 
+        public static HarmonyLoadManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new HarmonyLoadManager();
+                }
+                return instance;
+            }
+        }
+
+        //static HarmonyLoadManager()
+        //{
+        //    Identifier id = Identifier.CreateImageIdentifier(Identifier.CreateDummyPatientKey(), "1.3.46.670589.61.128.0.202308181459004783629047404.0",
+        //        "1.3.46.670589.61.128.1.20230818145912017000100013325131495", "1.3.46.670589.61.128.2.20230818145919608010100010532657604");
+        //    StorageKey storageKey = new StorageKey("LocalDatabase", id);
+        //    //StorageKeyCollection k1 = new StorageKeyCollection(k);
+
+        //    var dcmObj1 = DicomObject.CreateInstance(@"Y:\ImageData\1.3.46.670589.61.128.0.202308181459004783629047404.0\00010101\D01010001");
+
+        //    // to populate PixelRepresentations
+        //    var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj1, null);
+        //    var commonPixelData = new PixelDataImplementation(fetchResult, true);
+
+        //    dcmObj = new PersistentDicomObjectCollection();
+
+
+        //    dcmObj.Add(new PersistentDicomObject(storageKey, dcmObj1, commonPixelData, true));
+
+            
+        //    //LoadFullHeaders(k1);
+        //}
+
+        public override bool IsSeriesUnderConstruction(StorageKey seriesKey)
+        {
+            return false;
         }
 
         public override PersistentDicomObjectCollection LoadFastHeaders(StorageKeyCollection storageKeys)
@@ -76,12 +110,12 @@ namespace CTHarmonyAdapters
 
             timer.Stop();
 
-            var processInfo = Process.GetCurrentProcess();
+            //var processInfo = Process.GetCurrentProcess();
 
-            var logMessage = $"{DateTime.Now.ToString("hh.mm.ss.ffffff")} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
-                             $" LoadFastHeaders:  {timer.ElapsedTicks / 10000}, WCF-GetFilePaths: {wcfTimer.ElapsedTicks / 10000}\n";
+            //var logMessage = $"{DateTime.Now.ToString("hh.mm.ss.ffffff")} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
+            //                 $" LoadFastHeaders:  {timer.ElapsedTicks / 10000}, WCF-GetFilePaths: {wcfTimer.ElapsedTicks / 10000}\n";
 
-            File.AppendAllText(@"D:\MyLogs\HarmonyIncisiveLogs.txt", logMessage);
+            //File.AppendAllText(@"D:\MyLogs\HarmonyIncisiveLogs.txt", logMessage);
 
             return persistentDicomObjects;
 
@@ -104,6 +138,37 @@ namespace CTHarmonyAdapters
         {
             throw new NotImplementedException();
         }
+
+        private static PersistentDicomObjectCollection dcmObj;
+        
+        //public override PersistentDicomObjectCollection LoadFullHeaders(StorageKeyCollection storageKeys)
+        //{
+        //    var timer = Stopwatch.StartNew();
+
+        //    //if(dcmObj == null)
+        //    //{
+        //        //var dcmObj1 = DicomObject.CreateInstance(@"Y:\ImageData\1.3.46.670589.61.128.0.202308181459004783629047404.0\00010101\D01010001");
+
+        //        //// to populate PixelRepresentations
+        //        //var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj1, null);
+        //        //var commonPixelData = new PixelDataImplementation(fetchResult, true);
+
+        //        //dcmObj.Add(new PersistentDicomObject(storageKeys[0], dcmObj1, commonPixelData, true));
+
+        //    //}
+
+        //    timer.Stop();
+        //    var processInfo = Process.GetCurrentProcess();
+
+        //    var logMessage = $"{DateTime.Now.ToString("hh.mm.ss.ffffff")} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
+        //                     $" LoadFullHeaders:  {timer.ElapsedTicks / 10000}\n";
+
+        //    File.AppendAllText(@"D:\MyLogs\HarmonyIncisiveLogs.txt", logMessage);
+
+
+        //    return dcmObj;
+        //}
+
 
         public override PersistentDicomObjectCollection LoadFullHeaders(StorageKeyCollection storageKeys)
         {
@@ -130,7 +195,7 @@ namespace CTHarmonyAdapters
             {
                 var dcmObj = DicomObject.CreateInstance(imageFilePaths.ElementAt(itemIndex));
 
-                // to populate PixelData
+                // to populate PixelRepresentations
                 var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj, null);
                 var commonPixelData = new PixelDataImplementation(fetchResult, true);
 
@@ -138,12 +203,12 @@ namespace CTHarmonyAdapters
             }
             timer.Stop();
 
-            var processInfo = Process.GetCurrentProcess();
+            //var processInfo = Process.GetCurrentProcess();
 
-            var logMessage = $"{DateTime.Now.ToString("hh.mm.ss.ffffff")} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
-                             $" LoadFullHeaders:  {timer.ElapsedTicks / 10000}, WCF-GetFilePaths: {wcfTimer.ElapsedTicks / 10000}\n";
+            //var logMessage = $"{DateTime.Now.ToString("hh.mm.ss.ffffff")} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
+            //                 $" LoadFullHeaders:  {timer.ElapsedTicks / 10000}, WCF-GetFilePaths: {wcfTimer.ElapsedTicks / 10000}\n";
 
-            File.AppendAllText(@"D:\MyLogs\HarmonyIncisiveLogs.txt", logMessage);
+            //File.AppendAllText(@"D:\MyLogs\HarmonyIncisiveLogs.txt", logMessage);
 
             return persistentDicomObjects;
         }
@@ -178,7 +243,7 @@ namespace CTHarmonyAdapters
         public override void LoadPixelModules(PersistentDicomObjectCollection headers, EventHandler<LoadProgressChangedEventArgs> progressCallback,
             CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return;
         }
 
         public override LoadTask LoadPixelModulesAsync(PersistentDicomObjectCollection headers)
