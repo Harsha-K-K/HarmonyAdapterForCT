@@ -31,7 +31,7 @@ namespace CTHarmonyAdapters
         private HarmonyQueryManager()
         {
             var binding = new NetTcpBinding(SecurityMode.None);
-            binding.MaxReceivedMessageSize = int.MaxValue;
+            //binding.MaxReceivedMessageSize = int.MaxValue;
 
             var channel = new ChannelFactory<IIncisiveAccessor.IIncisiveAccessor>(binding);
             var endpoint = new EndpointAddress(Uri);

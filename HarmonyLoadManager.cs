@@ -21,7 +21,7 @@ namespace CTHarmonyAdapters
 
         private HarmonyLoadManager() {
             var binding = new NetTcpBinding(SecurityMode.None);
-            binding.MaxReceivedMessageSize = int.MaxValue;
+            //binding.MaxReceivedMessageSize = int.MaxValue;
 
             var channel = new ChannelFactory<IIncisiveAccessor.IIncisiveAccessor>(binding);
             var endpoint = new EndpointAddress(Uri);
@@ -81,11 +81,15 @@ namespace CTHarmonyAdapters
 
             foreach (var storageKey in storageKeys)
             {
-                studyInstanceUids.Add(storageKey.Identifier.StudyInstanceUid);
-                seriesInstanceUids.Add(storageKey.Identifier.SeriesInstanceUid);
+                var sopUids = proxy.GetSopInstanceUids(storageKey.Identifier.SeriesInstanceUid);
 
-                var sopInstanceUid = proxy.GetSopInstanceUids(storageKey.Identifier.SeriesInstanceUid);
-                sopInstanceUids.Add(sopInstanceUid.FirstOrDefault()); // optimise: GetAt(0) ??
+                foreach(var sopInstanceUid in sopUids)
+                {
+                    studyInstanceUids.Add(storageKey.Identifier.StudyInstanceUid);
+                    seriesInstanceUids.Add(storageKey.Identifier.SeriesInstanceUid);
+                    sopInstanceUids.Add(sopInstanceUid);
+                }
+
             }
 
             var wcfTimer = Stopwatch.StartNew();
@@ -100,7 +104,7 @@ namespace CTHarmonyAdapters
                 var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj, null);
                 var commonPixelData = new PixelDataImplementation(fetchResult, true);
 
-                var p = Identifier.CreateImageIdentifier(storageKeys[itemIndex].Identifier.PatientKey,studyInstanceUids[itemIndex],
+                var p = Identifier.CreateImageIdentifier(storageKeys[0].Identifier.PatientKey,studyInstanceUids[itemIndex],
                     seriesInstanceUids[itemIndex], sopInstanceUids[itemIndex]);
 
                 var key = new StorageKey("LocalDatabase", p);
@@ -138,9 +142,7 @@ namespace CTHarmonyAdapters
         {
             throw new NotImplementedException();
         }
-
-        private static PersistentDicomObjectCollection dcmObj;
-        
+      
         //public override PersistentDicomObjectCollection LoadFullHeaders(StorageKeyCollection storageKeys)
         //{
         //    var timer = Stopwatch.StartNew();
