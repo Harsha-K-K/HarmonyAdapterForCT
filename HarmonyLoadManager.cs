@@ -1,4 +1,4 @@
-﻿using Philips.Platform.Adapters.Services;
+﻿//using Philips.Platform.Adapters.Services;
 using Philips.Platform.ApplicationIntegration.DataAccess;
 using Philips.Platform.Common;
 using Philips.Platform.StorageDevicesClient;
@@ -8,8 +8,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
 using System.Threading;
+using Philips.Platform.Adapters.Services;
 
 namespace CTHarmonyAdapters
 {
@@ -129,6 +129,7 @@ namespace CTHarmonyAdapters
         public override PersistentDicomObjectCollection LoadFastHeaders(StorageKeyCollection storageKeys, EventHandler<LoadProgressChangedEventArgs> progressCallback,
             CancellationToken cancellationToken)
         {
+
             throw new NotImplementedException();
         }
 

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{BA7DEC2E-36FA-4B75-9D27-DE3149189D49}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>CTHarmonyAdapters</RootNamespace>
     <AssemblyName>CTHarmonyAdapters</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -59,6 +59,9 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ChDefine">
       <HintPath>..\..\CT_SW_Console\Bin\Output\ChDefine.dll</HintPath>
@@ -72,17 +75,22 @@
     <Reference Include="Philips.Platform.Adapters">
       <HintPath>..\..\cp\AIP\Output\Bin\Philips.Platform.Adapters.dll</HintPath>
     </Reference>
-    <Reference Include="Philips.Platform.ApplicationIntegration">
-      <HintPath>..\..\AII-Binaries\Philips.Platform.ApplicationIntegration.dll</HintPath>
+    <Reference Include="Philips.Platform.ApplicationIntegration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\cp\AII\Output\Bin\Philips.Platform.ApplicationIntegration.dll</HintPath>
     </Reference>
-    <Reference Include="Philips.Platform.CommonTypes">
-      <HintPath>..\..\AII-Binaries\Philips.Platform.CommonTypes.dll</HintPath>
-    </Reference>
-    <Reference Include="Philips.Platform.DicomDictionary">
-      <HintPath>..\..\AII-Binaries\Philips.Platform.DicomDictionary.dll</HintPath>
+    <Reference Include="Philips.Platform.CommonTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\cp\Common\Output\Bin\Philips.Platform.CommonTypes.dll</HintPath>
     </Reference>
     <Reference Include="Philips.Platform.StorageDevices.Abstractions">
       <HintPath>..\..\cp\AIP\Output\Bin\Philips.Platform.StorageDevices.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Philips.Platform.System">
+      <HintPath>..\..\cp\System\SystemComponents\Output\Bin\Philips.Platform.System.dll</HintPath>
+    </Reference>
+    <Reference Include="Philips.Platform.SystemIntegration">
+      <HintPath>..\..\cp\SII\Output\Bin\Philips.Platform.SystemIntegration.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -101,12 +109,17 @@
     <Compile Include="HarmonyStoreManager.cs" />
     <Compile Include="HarmonySystemComposition.cs" />
     <Compile Include="HarmonyTracer.cs" />
+    <Compile Include="PixelDataImpl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="ClassDiagrams\HarmonyStoreManager.cd" />
+    <None Include="ClassDiagrams\HarmonyLoadManager.cd" />
+    <None Include="ClassDiagrams\HarmonyQueryManager.cd" />
     <None Include="PmsMip.snk" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

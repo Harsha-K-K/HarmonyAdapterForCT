@@ -16,14 +16,12 @@ namespace CTHarmonyAdapters
             int processId, string processName, string machineName, string contextInfo, string additionalInfo,
             Exception exceptionInfo, StackTrace stackTrace)
         {
-            throw new NotImplementedException();
         }
 
         public override void LogMessage(int moduleId, int eventId, DateTime dateTime, LogType logType, string eventType, Severity severity,
             string[] descriptionParameters, int threadId, string threadName, int processId, string processName,
             string machineName, string contextInfo, string additionalInfo, Exception exceptionInfo, StackTrace stackTrace)
         {
-            throw new NotImplementedException();
         }
     }
 }
