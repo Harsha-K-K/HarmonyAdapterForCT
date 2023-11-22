@@ -1,5 +1,4 @@
 ﻿using ChDefine;
-using PatientDataInfo;
 using Philips.Platform.ApplicationIntegration.DataAccess;
 using Philips.Platform.ApplicationIntegration.Tracing;
 using Philips.Platform.Common;
@@ -61,8 +60,10 @@ namespace CTHarmonyAdapters
                 return TraceLevel.None;
             }
 
-            set {
-                throw new NotImplementedException(); }
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public override TimeSpan GetDeviceQueryTime
@@ -104,7 +105,7 @@ namespace CTHarmonyAdapters
             var timer = Stopwatch.StartNew();
             var persistentDicomObjects = new PersistentDicomObjectCollection();
 
-            if(deviceID == "DummyStudyDevice")
+            if (deviceID == "DummyStudyDevice")
             {
                 if (filter.Value?[0] == "PR")
                 {
@@ -125,7 +126,7 @@ namespace CTHarmonyAdapters
 
             if (filter.QueryType == QueryType.MatchAny)
             {
-                if(filter.Value == null || filter.Value[0] == "")
+                if (filter.Value == null || filter.Value[0] == "")
                 {
                     return persistentDicomObjects;
                 }
@@ -182,7 +183,7 @@ namespace CTHarmonyAdapters
 
             }
 
-            else if( filter.QueryType == QueryType.And)
+            else if (filter.QueryType == QueryType.And)
             {
                 var patID = filter.Expression[0].Value[0];
 
@@ -254,7 +255,7 @@ namespace CTHarmonyAdapters
             dicomObject.SetString(DicomDictionary.DicomInstitutionName, null);
             dicomObject.SetString(DicomDictionary.DicomStudyInstanceUid, studyId);
             dicomObject.SetString(DicomDictionary.DicomStudyId, studyId);
-            if(seriesId != null)
+            if (seriesId != null)
             {
                 dicomObject.SetString(DicomDictionary.DicomSeriesInstanceUid, seriesId);
             }
@@ -291,7 +292,7 @@ namespace CTHarmonyAdapters
                 persistentDicomObjects.Add(new PersistentDicomObject(key1, dcmObject1, null, false));
 
                 return persistentDicomObjects;
-                
+
             }
 
             var dataInfo = Proxy.GetPatientStudyImageInfo(storagekey.Identifier.StudyInstanceUid);
@@ -341,7 +342,7 @@ namespace CTHarmonyAdapters
                 persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObject, null, false));
 
             }
-             
+
             return persistentDicomObjects;
 
         }

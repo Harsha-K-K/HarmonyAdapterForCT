@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Philips.Platform.ApplicationIntegration.DataAccess;
+﻿using Philips.Platform.ApplicationIntegration.DataAccess;
 using Philips.Platform.Common;
+using System;
 
 namespace CTHarmonyAdapters
 {
@@ -61,11 +57,11 @@ namespace CTHarmonyAdapters
             {
                 if (imagePixelDescription == null)
                 {
-                    
+
                     //        imageConversionInformation =
                     //            new ImageConversionInformation(imageDicomObject);
-                            
-                    
+
+
                     //PlanarConfiguration planarConfig =
                     //    GetPlanarConfiguration(imageConversionInformation.PlanarConfiguration);
                     //bool isImageConverted =

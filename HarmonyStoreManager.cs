@@ -1,8 +1,8 @@
-﻿using System;
-using System.Reflection;
-using Philips.Platform.ApplicationIntegration.Decoupling;
+﻿using Philips.Platform.ApplicationIntegration.Decoupling;
 using Philips.Platform.Common;
 using Philips.Platform.SystemIntegration.Decoupling;
+using System;
+using System.Reflection;
 
 namespace CTHarmonyAdapters
 {
@@ -17,7 +17,7 @@ namespace CTHarmonyAdapters
             //var c = t.GetConstructor(new object { });
             var sc = (SystemCompositionBase)Activator.CreateInstance(t);
             var m = t.GetProperty("StoreManager", BindingFlags.NonPublic | BindingFlags.Instance);
-            
+
             actualStoreManager = (StoreManagerBase)m.GetValue(sc);
         }
 

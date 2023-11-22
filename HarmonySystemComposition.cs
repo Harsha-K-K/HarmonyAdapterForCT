@@ -1,8 +1,5 @@
-﻿using Philips.Platform.Adapters.Authorization;
-using Philips.Platform.Adapters.Services;
-using Philips.Platform.ApplicationIntegration.Decoupling;
+﻿using Philips.Platform.ApplicationIntegration.Decoupling;
 using Philips.Platform.Common;
-using Philips.Platform.Dicom;
 using Philips.Platform.SystemIntegration.Decoupling;
 
 namespace CTHarmonyAdapters
@@ -10,7 +7,14 @@ namespace CTHarmonyAdapters
     public class HarmonySystemComposition : SystemCompositionBase
 
     {
-        private DeviceConfigurationReader deviceCongifReader;
+        private DataModificationEventsBase incisiveEventManager = new IncisiveEventManager();
+        private DeviceCapabilitiesManagerBase incisiveCapabilitiesManager = new IncisiveCapabilitiesManager();
+        private AuthorizationManagerBase incisiveAuthorizationManager = new IncisiveAuthorizationManager();
+        private PatientKeyProviderBase incisivePatientKeyProvider = new IncisivePatientKeyProvider();
+        private DeviceConfigurationReaderBase incisiveDeviceConfigurationReader = new IncisiveDeviceConfigurationReader();
+        private DeviceConfigurationWriterBase incisiveDeviceConfigurationWriter = new IncisiveDeviceConfigurationWriter();
+
+        //private DeviceConfigurationReader deviceCongifReader;
         //private SystemCompositionBase sc;
         //private DicomObjectFactoryBase factory;
         public HarmonySystemComposition()
@@ -40,12 +44,12 @@ namespace CTHarmonyAdapters
         protected override DataModificationEventsBase CreateDataModificationEvents()
         {
             //dummy return
-            return EventManager.Instance;
+            return incisiveEventManager;
         }
 
         protected override DeviceCapabilitiesManagerBase CreateDeviceCapabilitiesManager()
         {
-            return Philips.Platform.Adapters.Services.DeviceCapabilitiesManager.Instance;
+            return incisiveCapabilitiesManager;
         }
 
         protected override DicomObjectFactoryBase CreateDicomObjectFactory()
@@ -55,22 +59,22 @@ namespace CTHarmonyAdapters
 
         protected override AuthorizationManagerBase CreateAuthorizationManager()
         {
-            return AipAuthorizationManager.Instance;
+            return incisiveAuthorizationManager;
         }
 
         protected override PatientKeyProviderBase CreatePatientKeyProvider()
         {
-            return Philips.Platform.StorageDevices.PatientKeyProvider.Instance;
+            return incisivePatientKeyProvider;
         }
 
         protected override DeviceConfigurationReaderBase CreateDeviceConfigurationReader()
         {
-            return new DeviceConfigurationReader();
+            return incisiveDeviceConfigurationReader;
         }
 
         protected override DeviceConfigurationWriterBase CreateDeviceConfigurationWriter()
         {
-            return new DeviceConfigurationWriter();
+            return incisiveDeviceConfigurationWriter;
         }
 
         protected override LoadManagerBase CreateLoadManager()
@@ -90,7 +94,8 @@ namespace CTHarmonyAdapters
         protected override StoreManagerBase CreateStoreManager()
         {
             return base.CreateStoreManager();
-            /*return new HarmonyStoreManager()*/;
+            /*return new HarmonyStoreManager()*/
+            ;
         }
 
         protected override CommonTracingBase CreateTracing()

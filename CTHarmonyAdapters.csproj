@@ -72,10 +72,6 @@
     <Reference Include="PatientDataInfo">
       <HintPath>..\..\IncisiveDBAccessor\IIncisiveAccessor\bin\x64\Debug\PatientDataInfo.dll</HintPath>
     </Reference>
-    <Reference Include="Philips.Platform.Adapters, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\cp\AIP\Output\Bin\Philips.Platform.Adapters.dll</HintPath>
-    </Reference>
     <Reference Include="Philips.Platform.ApplicationIntegration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\cp\AII\Output\Bin\Philips.Platform.ApplicationIntegration.dll</HintPath>
@@ -87,16 +83,6 @@
     <Reference Include="Philips.Platform.Dicom, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\cp\DomainLibraries\Dicom\Output\Bin\Philips.Platform.Dicom.dll</HintPath>
-    </Reference>
-    <Reference Include="Philips.Platform.StorageDevices, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\cp\AIP\Output\Bin\Philips.Platform.StorageDevices.dll</HintPath>
-    </Reference>
-    <Reference Include="Philips.Platform.StorageDevices.Abstractions">
-      <HintPath>..\..\cp\AIP\Output\Bin\Philips.Platform.StorageDevices.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Philips.Platform.System">
-      <HintPath>..\..\cp\System\SystemComponents\Output\Bin\Philips.Platform.System.dll</HintPath>
     </Reference>
     <Reference Include="Philips.Platform.SystemIntegration">
       <HintPath>..\..\cp\SII\Output\Bin\Philips.Platform.SystemIntegration.dll</HintPath>
@@ -112,12 +98,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IncisiveAuthorizationManager.cs" />
+    <Compile Include="IncisiveCapabilitiesManager.cs" />
+    <Compile Include="IncisiveDeviceConfigurationReader.cs" />
+    <Compile Include="IncisiveDeviceConfigurationWriter.cs" />
+    <Compile Include="IncisiveEventManager.cs" />
     <Compile Include="HarmonyLoadManager.cs" />
     <Compile Include="HarmonyLogger.cs" />
     <Compile Include="HarmonyQueryManager.cs" />
     <Compile Include="HarmonyStoreManager.cs" />
     <Compile Include="HarmonySystemComposition.cs" />
     <Compile Include="HarmonyTracer.cs" />
+    <Compile Include="IncisivePatientKeyProvider.cs" />
     <Compile Include="PixelDataImpl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
