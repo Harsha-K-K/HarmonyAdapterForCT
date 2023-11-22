@@ -64,15 +64,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ChDefine">
-      <HintPath>..\..\CT_SW_Console\Bin\Output\ChDefine.dll</HintPath>
+      <HintPath>..\..\IncisiveDBAccessor\IIncisiveAccessor\bin\x64\Debug\ChDefine.dll</HintPath>
     </Reference>
     <Reference Include="IIncisiveAccessor">
-      <HintPath>..\..\IncisiveDBAccessor\IIncisiveAccessor\bin\Debug\IIncisiveAccessor.dll</HintPath>
+      <HintPath>..\..\IncisiveDBAccessor\IIncisiveAccessor\bin\x64\Debug\IIncisiveAccessor.dll</HintPath>
     </Reference>
     <Reference Include="PatientDataInfo">
-      <HintPath>..\..\CT_SW_Console\Bin\Output\PatientDataInfo.dll</HintPath>
+      <HintPath>..\..\IncisiveDBAccessor\IIncisiveAccessor\bin\x64\Debug\PatientDataInfo.dll</HintPath>
     </Reference>
-    <Reference Include="Philips.Platform.Adapters">
+    <Reference Include="Philips.Platform.Adapters, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\cp\AIP\Output\Bin\Philips.Platform.Adapters.dll</HintPath>
     </Reference>
     <Reference Include="Philips.Platform.ApplicationIntegration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
@@ -82,6 +83,14 @@
     <Reference Include="Philips.Platform.CommonTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\cp\Common\Output\Bin\Philips.Platform.CommonTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="Philips.Platform.Dicom, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\cp\DomainLibraries\Dicom\Output\Bin\Philips.Platform.Dicom.dll</HintPath>
+    </Reference>
+    <Reference Include="Philips.Platform.StorageDevices, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\cp\AIP\Output\Bin\Philips.Platform.StorageDevices.dll</HintPath>
     </Reference>
     <Reference Include="Philips.Platform.StorageDevices.Abstractions">
       <HintPath>..\..\cp\AIP\Output\Bin\Philips.Platform.StorageDevices.Abstractions.dll</HintPath>

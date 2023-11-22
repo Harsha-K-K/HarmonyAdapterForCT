@@ -1,14 +1,12 @@
 ﻿using ChDefine;
-using Philips.Platform.ApplicationIntegration;
+using PatientDataInfo;
 using Philips.Platform.ApplicationIntegration.DataAccess;
 using Philips.Platform.ApplicationIntegration.Tracing;
 using Philips.Platform.Common;
 using Philips.Platform.Common.DataAccess;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
 using TraceLevel = Philips.Platform.Common.TraceLevel;
 
 namespace CTHarmonyAdapters
@@ -49,6 +47,7 @@ namespace CTHarmonyAdapters
             var channel = new ChannelFactory<IIncisiveAccessor.IIncisiveAccessor>(binding);
             var endpoint = new EndpointAddress(Uri);
             Proxy = channel.CreateChannel(endpoint);
+
         }
 
         public override TraceLevel TraceLevel
@@ -105,24 +104,45 @@ namespace CTHarmonyAdapters
             var timer = Stopwatch.StartNew();
             var persistentDicomObjects = new PersistentDicomObjectCollection();
 
+            if(deviceID == "DummyStudyDevice")
+            {
+                if (filter.Value?[0] == "PR")
+                {
+                    return persistentDicomObjects;
+                }
+
+                var studyID = filter.Value != null ? filter.Value[0] : parentIdentifier.StudyInstanceUid;
+                var dcmObject = CreateDummyDicom(studyID, null);
+
+                var id = Identifier.CreateStudyIdentifier(Identifier.CreateDummyPatientKey(), studyID);
+                var key = new StorageKey("DummyStudyDevice", id);
+
+                persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObject, null, false));
+
+                return persistentDicomObjects;
+
+            }
+
             if (filter.QueryType == QueryType.MatchAny)
             {
-                if(filter.Value != null)
+                if(filter.Value == null || filter.Value[0] == "")
+                {
+                    return persistentDicomObjects;
+                }
+                else
                 {
                     var patientStudyInfo = Proxy.GetPatientStudyInfo(filter.Value?[0]);
 
+                    if (patientStudyInfo.StudyInfo.StudyInstanceUID != null || patientStudyInfo.StudyInfo.StudyInstanceUID == "")
+                    {
+                        return persistentDicomObjects;
+                    }
                     var dcmObject = CreateDicom(patientStudyInfo.StudyInfo, patientStudyInfo.PatientInfo);
 
                     var id = Identifier.CreateStudyIdentifier(Identifier.CreatePatientKeyFromDicomObject(dcmObject), patientStudyInfo.StudyInfo.StudyInstanceUID);
                     var key = new StorageKey("LocalDatabase", id);
 
                     persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObject, null, false));
-
-                    return persistentDicomObjects;
-
-                }
-                else
-                {
                     return persistentDicomObjects;
 
                 }
@@ -162,6 +182,22 @@ namespace CTHarmonyAdapters
 
             }
 
+            else if( filter.QueryType == QueryType.And)
+            {
+                var patID = filter.Expression[0].Value[0];
+
+                var patientInfo = Proxy.GetPatientInfoFromID(patID);
+
+                var patientStudyInfo = Proxy.GetPatientStudyInfo(patientInfo.StudyInstanceUID);
+
+                var dcmObject = CreateDicom(patientStudyInfo.StudyInfo, patientStudyInfo.PatientInfo);
+
+                var id = Identifier.CreateStudyIdentifier(Identifier.CreatePatientKeyFromDicomObject(dcmObject), patientStudyInfo.StudyInfo.StudyInstanceUID);
+                var key = new StorageKey("LocalDatabase", id);
+
+                persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObject, null, false));
+            }
+
             else if (filter.QueryType == QueryType.MatchExactString)
             {
                 if (filter.Tag.Name == "DicomModality" && filter.Value?[0] == "PR")
@@ -196,6 +232,38 @@ namespace CTHarmonyAdapters
 
         }
 
+        private DicomObject CreateDummyDicom(string studyId, string seriesId)
+        {
+            var dicomObject = DicomObject.CreateInstance();
+
+            dicomObject.SetString(DicomDictionary.DicomSeriesTime, DateTime.Now.Date.ToString());
+            dicomObject.SetString(DicomDictionary.DicomContentTime, null);
+            dicomObject.SetString(DicomDictionary.DicomModality, "CT");
+            dicomObject.SetString(DicomDictionary.DicomManufacturer, "Philips");
+            dicomObject.SetString(DicomDictionary.DicomInstitutionName, null);
+            dicomObject.SetString(DicomDictionary.DicomStationName, null);
+            dicomObject.SetString(DicomDictionary.DicomSeriesDescription, "");
+            dicomObject.SetString(DicomDictionary.DicomPatientName, "DummyPat");
+            dicomObject.SetString(DicomDictionary.DicomPatientId, "101");
+            dicomObject.SetString(DicomDictionary.DicomPatientBirthDate, "14/02/1990");
+            dicomObject.SetString(DicomDictionary.DicomBodyPartExamined, null);
+            dicomObject.SetString(DicomDictionary.DicomSoftwareVersions, "INCISIVE5_1");
+            dicomObject.SetString(DicomDictionary.DicomStudyTime, DateTime.Now.Date.ToString());
+            dicomObject.SetString(DicomDictionary.DicomAccessionNumber, "111");
+            dicomObject.SetString(DicomDictionary.DicomModalitiesInStudy, "CT");
+            dicomObject.SetString(DicomDictionary.DicomInstitutionName, null);
+            dicomObject.SetString(DicomDictionary.DicomStudyInstanceUid, studyId);
+            dicomObject.SetString(DicomDictionary.DicomStudyId, studyId);
+            if(seriesId != null)
+            {
+                dicomObject.SetString(DicomDictionary.DicomSeriesInstanceUid, seriesId);
+            }
+            dicomObject.SetString(DicomDictionary.DicomPerformedProcedureStepDescription, "");
+            dicomObject.SetString(DicomDictionary.DicomDateTime, null);
+
+            return dicomObject;
+        }
+
         public override QueryTask QueryAsync(string deviceID, QueryLevel level, Identifier parentIdentifier, DicomFilter filter, EventHandler<Philips.Platform.ApplicationIntegration.DataAccess.QueryProgressChangedEventArgs> progressCallback, EventHandler<Philips.Platform.ApplicationIntegration.DataAccess.QueryCompletedEventArgs> completedCallback)
         {
             throw new NotImplementedException();
@@ -212,6 +280,19 @@ namespace CTHarmonyAdapters
 
             var timer = Stopwatch.StartNew();
             var persistentDicomObjects = new PersistentDicomObjectCollection();
+
+            if (storagekey.SourceDevice == "DummyStudyDevice")
+            {
+                var dcmObject1 = CreateDummyDicom(storagekey.Identifier.StudyInstanceUid, "1.3.46.670589.88.2269738417469835076.264587346879930907");
+
+                var id1 = Identifier.CreateSeriesIdentifier(Identifier.CreateDummyPatientKey(), storagekey.Identifier.StudyInstanceUid, "1.3.46.670589.88.2269738417469835076.264587346879930907");
+                var key1 = new StorageKey("DummyStudyDevice", id1);
+
+                persistentDicomObjects.Add(new PersistentDicomObject(key1, dcmObject1, null, false));
+
+                return persistentDicomObjects;
+                
+            }
 
             var dataInfo = Proxy.GetPatientStudyImageInfo(storagekey.Identifier.StudyInstanceUid);
 
@@ -248,7 +329,21 @@ namespace CTHarmonyAdapters
 
         public override PersistentDicomObjectCollection QueryStudy(string deviceToQuery, DicomFilter filter)
         {
-            throw new NotImplementedException();
+            var persistentDicomObjects = new PersistentDicomObjectCollection();
+
+            if (deviceToQuery == "DummyStudyDevice" && filter.QueryType == QueryType.MatchAll)
+            {
+                var dcmObject = CreateDummyDicom("1.3.46.670589.88.74503675686557505.243252870275214482", null);
+
+                var id = Identifier.CreateStudyIdentifier(Identifier.CreateDummyPatientKey(), "1.3.46.670589.88.74503675686557505.243252870275214482");
+                var key = new StorageKey("DummyStudyDevice", id);
+
+                persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObject, null, false));
+
+            }
+             
+            return persistentDicomObjects;
+
         }
 
         public override PersistentDicomObjectCollection QueryStudy(string deviceToQuery, DicomFilter filter, DictionaryTagsCollection sortCriteria, QuerySortOrder sortOrder, int maxRecords)
