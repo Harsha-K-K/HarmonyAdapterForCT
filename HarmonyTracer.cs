@@ -13,12 +13,12 @@ namespace CTHarmonyAdapters
 
         public override TraceLevel GetTraceLevel(string namespaceOrModuleName, string className)
         {
-            throw new NotImplementedException();
+            return TraceLevel.None;
         }
 
         public override TraceLevel GetTraceLevel(string category, string namespaceOrModuleName, string className)
         {
-            throw new NotImplementedException();
+            return TraceLevel.None;
         }
 
         public override void SetDefaultTraceLevel(TraceLevel defaultTraceLevel)

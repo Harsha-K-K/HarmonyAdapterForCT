@@ -1,9 +1,12 @@
 ﻿using ChDefine;
+using Philips.Platform.ApplicationIntegration;
 using Philips.Platform.ApplicationIntegration.DataAccess;
+using Philips.Platform.ApplicationIntegration.Tracing;
 using Philips.Platform.Common;
 using Philips.Platform.Common.DataAccess;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using TraceLevel = Philips.Platform.Common.TraceLevel;
@@ -14,7 +17,10 @@ namespace CTHarmonyAdapters
     {
         public IIncisiveAccessor.IIncisiveAccessor Proxy;
         private const string Uri = "net.tcp://localhost:6565/IncisiveAccessor";
-        private static HarmonyQueryManager instance = null;
+        private static HarmonyQueryManager instance;
+        private static object syncRoot = new object();
+        private static PerformanceTracer perfTracer =
+            PerformanceTracer.CreatePerformanceTracer(typeof(HarmonyQueryManager));
 
         public static HarmonyQueryManager Instance
         {
@@ -22,8 +28,15 @@ namespace CTHarmonyAdapters
             {
                 if (instance == null)
                 {
-                    instance = new HarmonyQueryManager();
+                    lock (syncRoot)
+                    {
+                        if (instance == null)
+                        {
+                            instance = new HarmonyQueryManager();
+                        }
+                    }
                 }
+
                 return instance;
             }
         }
@@ -38,14 +51,41 @@ namespace CTHarmonyAdapters
             Proxy = channel.CreateChannel(endpoint);
         }
 
-        public override TraceLevel TraceLevel { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override TraceLevel TraceLevel
+        {
+            get
+            {
+                if (perfTracer.IsInfoOn) return TraceLevel.Info;
 
-        public override TimeSpan GetDeviceQueryTime => throw new NotImplementedException();
+                if (perfTracer.IsVerboseOn) return TraceLevel.Verbose;
 
-        public override TimeSpan GetExtractResultsTime => throw new NotImplementedException();
+                return TraceLevel.None;
+            }
+
+            set {
+                throw new NotImplementedException(); }
+        }
+
+        public override TimeSpan GetDeviceQueryTime
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+
+        public override TimeSpan GetExtractResultsTime
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
 
         public override bool CanQueryFrame(string deviceToquery)
         {
+
             throw new NotImplementedException();
         }
 
@@ -67,7 +107,25 @@ namespace CTHarmonyAdapters
 
             if (filter.QueryType == QueryType.MatchAny)
             {
-                return persistentDicomObjects;
+                if(filter.Value != null)
+                {
+                    var patientStudyInfo = Proxy.GetPatientStudyInfo(filter.Value?[0]);
+
+                    var dcmObject = CreateDicom(patientStudyInfo.StudyInfo, patientStudyInfo.PatientInfo);
+
+                    var id = Identifier.CreateStudyIdentifier(Identifier.CreatePatientKeyFromDicomObject(dcmObject), patientStudyInfo.StudyInfo.StudyInstanceUID);
+                    var key = new StorageKey("LocalDatabase", id);
+
+                    persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObject, null, false));
+
+                    return persistentDicomObjects;
+
+                }
+                else
+                {
+                    return persistentDicomObjects;
+
+                }
             }
 
             if (filter.QueryType == QueryType.MatchAll)
@@ -81,7 +139,7 @@ namespace CTHarmonyAdapters
                         var dcmObject = CreateDicom(patientStudyInfo.StudyInfo, patientStudyInfo.PatientInfo);
 
                         var id = Identifier.CreateStudyIdentifier(Identifier.CreatePatientKeyFromDicomObject(dcmObject), patientStudyInfo.StudyInfo.StudyInstanceUID);
-                        var key = new StorageKey("LocalDatabase", id);
+                        var key = new StorageKey(deviceID, id);
 
                         persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObject, null, false));
 
@@ -96,7 +154,7 @@ namespace CTHarmonyAdapters
                     var dcmObject = CreateDicom(dataInfo.studyInfo, dataInfo.patientInfo, dataInfo.imageSeriesInfo);
 
                     var id = Identifier.CreateSeriesIdentifier(Identifier.CreatePatientKeyFromDicomObject(dcmObject), parentIdentifier.StudyInstanceUid, dataInfo.imageSeriesInfo.SeriesInstanceUID);
-                    var key = new StorageKey("LocalDatabase", id);
+                    var key = new StorageKey(deviceID, id);
 
                     persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObject, null, false));
 
@@ -233,7 +291,7 @@ namespace CTHarmonyAdapters
 
             if (imageSeriesInfo != null)
             {
-                var modifiedDcmObject = AddImageSeriesInfo(imageSeriesInfo,dicomObject);
+                var modifiedDcmObject = AddImageSeriesInfo(imageSeriesInfo, dicomObject);
 
                 return modifiedDcmObject;
             }

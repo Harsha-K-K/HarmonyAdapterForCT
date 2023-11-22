@@ -101,6 +101,7 @@
     <Compile Include="HarmonyStoreManager.cs" />
     <Compile Include="HarmonySystemComposition.cs" />
     <Compile Include="HarmonyTracer.cs" />
+    <Compile Include="PixelDataImpl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
