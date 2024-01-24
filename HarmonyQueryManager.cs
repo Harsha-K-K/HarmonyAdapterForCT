@@ -5,7 +5,9 @@ using Philips.Platform.Common;
 using Philips.Platform.Common.DataAccess;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.ServiceModel;
+using System.Threading;
 using TraceLevel = Philips.Platform.Common.TraceLevel;
 
 namespace CTHarmonyAdapters
@@ -134,7 +136,7 @@ namespace CTHarmonyAdapters
                 {
                     var patientStudyInfo = Proxy.GetPatientStudyInfo(filter.Value?[0]);
 
-                    if (patientStudyInfo.StudyInfo.StudyInstanceUID != null || patientStudyInfo.StudyInfo.StudyInstanceUID == "")
+                    if (patientStudyInfo.StudyInfo.StudyInstanceUID == null || patientStudyInfo.StudyInfo.StudyInstanceUID == "")
                     {
                         return persistentDicomObjects;
                     }
@@ -170,6 +172,12 @@ namespace CTHarmonyAdapters
                 else
                 {
                     //Debugger.Launch();
+
+                    //var processInfo = Process.GetCurrentProcess();
+
+                    //var logMessage = $"\n{DateTime.Now:hh.mm.ss.ffffff} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}, Thread: {Thread.CurrentThread.Name}; {Thread.CurrentThread.ManagedThreadId} \n";
+                    
+                    //File.AppendAllText($@"D:\MyLogs\GetPatientStudyImageInfo_{processInfo.ProcessName}_{processInfo.Id}.txt", logMessage + Environment.StackTrace);
 
                     var dataInfo = Proxy.GetPatientStudyImageInfo(parentIdentifier.StudyInstanceUid);
                     var dcmObject = CreateDicom(dataInfo.studyInfo, dataInfo.patientInfo, dataInfo.imageSeriesInfo);
@@ -294,6 +302,12 @@ namespace CTHarmonyAdapters
                 return persistentDicomObjects;
 
             }
+
+            //var processInfo = Process.GetCurrentProcess();
+
+            //var logMessage = $"\n{DateTime.Now:hh.mm.ss.ffffff} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}, Thread: {Thread.CurrentThread.Name}; {Thread.CurrentThread.ManagedThreadId} \n";
+
+            //File.AppendAllText($@"D:\MyLogs\GetPatientStudyImageInfo_{processInfo.ProcessName}_{processInfo.Id}.txt", logMessage + Environment.StackTrace);
 
             var dataInfo = Proxy.GetPatientStudyImageInfo(storagekey.Identifier.StudyInstanceUid);
 

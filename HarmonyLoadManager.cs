@@ -1,10 +1,15 @@
-﻿using Philips.Platform.ApplicationIntegration.DataAccess;
+﻿using Philips.Platform.Adapters.Services;
+using Philips.Platform.ApplicationIntegration.DataAccess;
 using Philips.Platform.Common;
+using Philips.Platform.StorageDevicesClient;
+using PixelDataImpl;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.ServiceModel;
 using System.Threading;
 
@@ -39,28 +44,6 @@ namespace CTHarmonyAdapters
             }
         }
 
-        //static HarmonyLoadManager()
-        //{
-        //    Identifier id = Identifier.CreateImageIdentifier(Identifier.CreateDummyPatientKey(), "1.3.46.670589.61.128.0.202308181459004783629047404.0",
-        //        "1.3.46.670589.61.128.1.20230818145912017000100013325131495", "1.3.46.670589.61.128.2.20230818145919608010100010532657604");
-        //    StorageKey storageKey = new StorageKey("LocalDatabase", id);
-        //    //StorageKeyCollection k1 = new StorageKeyCollection(k);
-
-        //    var dcmObj1 = DicomObject.CreateInstance(@"Y:\ImageData\1.3.46.670589.61.128.0.202308181459004783629047404.0\00010101\D01010001");
-
-        //    // to populate PixelRepresentations
-        //    var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj1, null);
-        //    var commonPixelData = new PixelDataImplementation(fetchResult, true);
-
-        //    dcmObj = new PersistentDicomObjectCollection();
-
-
-        //    dcmObj.Add(new PersistentDicomObject(storageKey, dcmObj1, commonPixelData, true));
-
-
-        //    //LoadFullHeaders(k1);
-        //}
-
         public override bool IsSeriesUnderConstruction(StorageKey seriesKey)
         {
             return false;
@@ -75,15 +58,13 @@ namespace CTHarmonyAdapters
             {
                 var dcmObj = DicomObject.CreateInstance(@"C:\PortalPms\Demonstrator\IDS\DummyStudy\S211501\S102300\00001\CT_324.dcm");
 
-                //var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj, null);
-                //var commonPixelData = new PixelDataImplementation(fetchResult, true);
-
+                var commonPixelData = CreatePixelData(dcmObj);
                 var p = Identifier.CreateImageIdentifier(storageKeys[0].Identifier.PatientKey, storageKeys[0].Identifier.StudyInstanceUid,
                     storageKeys[0].Identifier.SeriesInstanceUid, dcmObj.GetString(DicomDictionary.DicomSopInstanceUid));
 
                 var key = new StorageKey("DummyStudyDevice", p);
 
-                //persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObj, commonPixelData, true));
+                persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObj, commonPixelData, true));
 
                 return persistentDicomObjects;
             }
@@ -109,12 +90,12 @@ namespace CTHarmonyAdapters
 
             var wcfTimer = Stopwatch.StartNew();
 
-            var processInfo = Process.GetCurrentProcess();
+            //var processInfo = Process.GetCurrentProcess();
 
-            var logMessage = $"{DateTime.Now.ToString("hh.mm.ss.ffffff")} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
-                            $" LoadFastHeaders:{studyInstanceUids}, {seriesInstanceUids}, {sopInstanceUids}\n" + Environment.StackTrace + "\n ------------------------------";
+            //var logMessage = $"{DateTime.Now.ToString("hh.mm.ss.ffffff")} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
+            //                $" LoadFastHeaders:{studyInstanceUids}, {seriesInstanceUids}, {sopInstanceUids}\n" + Environment.StackTrace + "\n ------------------------------";
 
-            File.AppendAllText($@"D:\MyLogs\CTHarmonyAdapters_{processInfo.Id}.txt", logMessage);
+            //File.AppendAllText($@"D:\MyLogs\CTHarmonyAdapters_{processInfo.Id}.txt", logMessage);
             var filepaths = proxy.GetImageFilePaths(studyInstanceUids, seriesInstanceUids, sopInstanceUids); //should get from DB
             wcfTimer.Stop();
 
@@ -123,15 +104,14 @@ namespace CTHarmonyAdapters
             {
                 var dcmObj = DicomObject.CreateInstance(filepathArray.ElementAt(itemIndex));
 
-                //var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj, null);
-                //var commonPixelData = new PixelDataImplementation(fetchResult, true);
+                var commonPixelData = CreatePixelData(dcmObj);
 
                 var p = Identifier.CreateImageIdentifier(storageKeys[0].Identifier.PatientKey, studyInstanceUids[itemIndex],
                     seriesInstanceUids[itemIndex], sopInstanceUids[itemIndex]);
 
                 var key = new StorageKey("LocalDatabase", p);
 
-                //persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObj, commonPixelData, true));
+                persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObj, commonPixelData, true));
             }
 
             timer.Stop();
@@ -204,15 +184,14 @@ namespace CTHarmonyAdapters
             {
                 var dcmObj = DicomObject.CreateInstance(@"C:\PortalPms\Demonstrator\IDS\DummyStudy\S211501\S102300\00001\CT_324.dcm");
 
-                //var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj, null);
-                //var commonPixelData = new PixelDataImplementation(fetchResult, true);
+                var commonPixelData = CreatePixelData(dcmObj);
 
                 var p = Identifier.CreateImageIdentifier(storageKeys[0].Identifier.PatientKey, storageKeys[0].Identifier.StudyInstanceUid,
                     storageKeys[0].Identifier.SeriesInstanceUid, dcmObj.GetString(DicomDictionary.DicomSopInstanceUid));
 
                 var key = new StorageKey("DummyStudyDevice", p);
 
-                //persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObj, commonPixelData, true));
+                persistentDicomObjects.Add(new PersistentDicomObject(key, dcmObj, commonPixelData, true));
 
                 return persistentDicomObjects;
             }
@@ -240,13 +219,13 @@ namespace CTHarmonyAdapters
             }
 
             var wcfTimer = Stopwatch.StartNew();
-            var processInfo = Process.GetCurrentProcess();
+            //var processInfo = Process.GetCurrentProcess();
 
-            var logMessage = $"{DateTime.Now.ToString("hh.mm.ss.ffffff")} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
-                            $" LoadFullHeaders: {studyInstanceUidCollections[0]}, {seriesInstanceUidCollections[0]}, {sopInstanceUidCollections[0]}\n"
-                            + Environment.StackTrace + "\n ------------------------------";
+            //var logMessage = $"{DateTime.Now.ToString("hh.mm.ss.ffffff")} ProcessID: {processInfo.Id}, ProcessName: {processInfo.ProcessName}," +
+            //                $" LoadFullHeaders: {studyInstanceUidCollections[0]}, {seriesInstanceUidCollections[0]}, {sopInstanceUidCollections[0]}\n"
+            //                + Environment.StackTrace + "\n ------------------------------";
 
-            File.AppendAllText($@"D:\MyLogs\CTHarmonyAdapters_{processInfo.Id}.txt", logMessage);
+            //File.AppendAllText($@"D:\MyLogs\CTHarmonyAdapters_{processInfo.Id}.txt", logMessage);
 
             var imageFilePaths = proxy.GetImageFilePaths(studyInstanceUidCollections, seriesInstanceUidCollections, sopInstanceUidCollections);
             wcfTimer.Stop();
@@ -256,10 +235,9 @@ namespace CTHarmonyAdapters
                 var dcmObj = DicomObject.CreateInstance(imageFilePaths.ElementAt(itemIndex));
 
                 // to populate PixelRepresentations
-                //var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj, null);
-                //var commonPixelData = new PixelDataImplementation(fetchResult, true);
+                var commonPixelData = CreatePixelData(dcmObj);
 
-                //persistentDicomObjects.Add(new PersistentDicomObject(storageKeys[itemIndex], dcmObj, commonPixelData, true));
+                persistentDicomObjects.Add(new PersistentDicomObject(storageKeys[itemIndex], dcmObj, commonPixelData, true));
             }
             timer.Stop();
 
@@ -271,6 +249,20 @@ namespace CTHarmonyAdapters
             //File.AppendAllText(@"D:\MyLogs\HarmonyIncisiveLogs.txt", logMessage);
 
             return persistentDicomObjects;
+        }
+
+        private PixelDataImplCopy CreatePixelData(DicomObject dcmObj)
+        {
+
+            //var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj, null);
+            //var commonPixelData = new PixelDataImplementation(fetchResult, true);
+
+            //var fetchResult = new FetchResult(PixelDataType.DicomFile, dcmObj, null);
+            var commonPixelData = new PixelDataImplCopy(dcmObj);
+
+            //var commonPixelData = new PixelDataImpl(dcmObj);
+
+            return commonPixelData;
         }
 
         public override void LoadFullHeaders(PersistentDicomObjectCollection persistentDicomObjectCollection)

@@ -1,5 +1,6 @@
 ﻿using Philips.Platform.ApplicationIntegration.Decoupling;
 using Philips.Platform.Common;
+using System.Security.Principal;
 
 namespace CTHarmonyAdapters
 {
@@ -12,7 +13,19 @@ namespace CTHarmonyAdapters
 
         public override User GetCurrentUser()
         {
-            return null;
+            User user = new User();
+            string userName = null;
+            WindowsIdentity currentIdentity = WindowsIdentity.GetCurrent();
+            if (currentIdentity != null)
+            {
+                userName = currentIdentity.Name;
+            }
+            if (!string.IsNullOrEmpty(userName))
+            {
+                user.UserId = userName;
+                user.Name = userName;
+            }
+            return user;
         }
     }
 }

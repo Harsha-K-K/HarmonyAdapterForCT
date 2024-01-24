@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -69,8 +71,20 @@
     <Reference Include="IIncisiveAccessor">
       <HintPath>..\..\IncisiveDBAccessor\IIncisiveAccessor\bin\x64\Debug\IIncisiveAccessor.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Configuration.Abstractions.8.0.0\lib\net462\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Binder, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Configuration.Binder.6.0.0\lib\net461\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Primitives.8.0.0\lib\net462\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
     <Reference Include="PatientDataInfo">
       <HintPath>..\..\IncisiveDBAccessor\IIncisiveAccessor\bin\x64\Debug\PatientDataInfo.dll</HintPath>
+    </Reference>
+    <Reference Include="Philips.Platform.Adapters">
+      <HintPath>..\..\cp\AII\Output\Bin\Philips.Platform.Adapters.dll</HintPath>
     </Reference>
     <Reference Include="Philips.Platform.ApplicationIntegration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -80,16 +94,45 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\cp\Common\Output\Bin\Philips.Platform.CommonTypes.dll</HintPath>
     </Reference>
+    <Reference Include="Philips.Platform.CommonUtilities">
+      <HintPath>..\..\cp\Common\Output\Bin\netstandard2.0\Philips.Platform.CommonUtilities.dll</HintPath>
+    </Reference>
     <Reference Include="Philips.Platform.Dicom, Version=1.0.0.0, Culture=neutral, PublicKeyToken=223d991ebf2e6ef5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\cp\DomainLibraries\Dicom\Output\Bin\Philips.Platform.Dicom.dll</HintPath>
     </Reference>
+    <Reference Include="Philips.Platform.DicomDictionary">
+      <HintPath>..\..\cp\Common\Output\Bin\Philips.Platform.DicomDictionary.dll</HintPath>
+    </Reference>
+    <Reference Include="Philips.Platform.StorageDevices.Abstractions">
+      <HintPath>..\..\cp\AII\Output\Bin\Philips.Platform.StorageDevices.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="Philips.Platform.SystemIntegration">
       <HintPath>..\..\cp\SII\Output\Bin\Philips.Platform.SystemIntegration.dll</HintPath>
     </Reference>
+    <Reference Include="PixelDataImpl">
+      <HintPath>..\..\PixelDataImplementation\PixelDataImpl\bin\Debug\PixelDataImpl.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -98,6 +141,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ImageConversionInformation.cs" />
+    <Compile Include="ImagePixelDescriptionHelper.cs" />
+    <Compile Include="ImageTranslator.cs" />
     <Compile Include="IncisiveAuthorizationManager.cs" />
     <Compile Include="IncisiveCapabilitiesManager.cs" />
     <Compile Include="IncisiveDeviceConfigurationReader.cs" />
@@ -110,6 +156,8 @@
     <Compile Include="HarmonySystemComposition.cs" />
     <Compile Include="HarmonyTracer.cs" />
     <Compile Include="IncisivePatientKeyProvider.cs" />
+    <Compile Include="MemoryManagerConstants.cs" />
+    <Compile Include="MemoryManagerNativeMethods.cs" />
     <Compile Include="PixelDataImpl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -119,8 +167,13 @@
     <None Include="ClassDiagrams\HarmonyStoreManager.cd" />
     <None Include="ClassDiagrams\HarmonyLoadManager.cd" />
     <None Include="ClassDiagrams\HarmonyQueryManager.cd" />
+    <None Include="packages.config" />
     <None Include="PmsMip.snk" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\Debug\CTHarmonyAdapters.dll" "D:\Repo\cp\AII\Output\Bin\" /Y /I
+xcopy "$(ProjectDir)bin\Debug\CTHarmonyAdapters.pdb" "D:\Repo\cp\AII\Output\Bin\" /Y /I</PostBuildEvent>
+  </PropertyGroup>
 </Project>

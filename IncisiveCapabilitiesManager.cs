@@ -1,6 +1,9 @@
 ﻿using Philips.Platform.ApplicationIntegration.Decoupling;
 using Philips.Platform.Common;
+using Philips.Platform.SystemIntegration.Decoupling;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace CTHarmonyAdapters
 {
@@ -18,7 +21,22 @@ namespace CTHarmonyAdapters
 
         public override StorageDeviceCapabilities GetStorageDeviceCapability(string deviceId)
         {
-            return null;
+            StorageDeviceCapabilities deviceCapabilities = new StorageDeviceCapabilities();
+
+            PropertyInfo propertyInfo = typeof(StorageDeviceCapabilities).GetProperty("DeviceId");
+            propertyInfo.SetValue(deviceCapabilities, deviceId);
+            PropertyInfo propertyInfoCanSubscribeForDataModifyEvent = typeof(StorageDeviceCapabilities).GetProperty("CanSubscribeForDataModifyEvent");
+            propertyInfoCanSubscribeForDataModifyEvent.SetValue(deviceCapabilities, true);
+
+            //var assemb = Assembly.Load("Philips.Platform.CommonTypes");
+            //var type = assemb.GetType("Philips.Platform.Common.StorageDeviceCapabilities");
+            //var q = type.GetProperty("DeviceId", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            //q.SetValue(this, deviceId);
+            //var sc = (StorageDeviceCapabilities)Activator.CreateInstance(type);
+
+            //StorageDeviceCapabilities deviceCapabilities = new StorageDeviceCapabilities();
+            //deviceCapabilities.DeviceId = deviceId;
+            return deviceCapabilities;
         }
 
         public override StorageDeviceCapabilitiesCollection GetStorageDeviceCapability(DeviceIdCollection deviceIds)
